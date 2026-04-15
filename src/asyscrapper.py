@@ -4,12 +4,12 @@ import csv
 import os
 from aiohttp import ClientSession, ClientTimeout
 
-API_URL = "https://world.openfoodfacts.org/cgi/search.pl"
-HEADERS = {"User-Agent": "MyAwesomeApp/1.0"}
+API_URL = "https://world.openfoodfacts.org/api/v2/search"
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
 
 OUTPUT_DIR = "data"
 
-CATEGORY = "sugar" #"bread", "milk", "champagnes", "butter" 
+CATEGORY = "champagnes" #"bread", "milk", "champagnes", "butter" 
 TARGET_COUNT = 180
 PAGE_SIZE = 100
 MAX_PAGES = 50
@@ -52,10 +52,7 @@ def extract_product_info(product):
 # -------------------------
 async def fetch_page(session, category, page, page_size, sem):
     params = {
-        "action": "process",
-        "tagtype_0": "categories",
-        "tag_contains_0": "contains",
-        "tag_0": category,
+        "categories_tags": category,
         "page": page,
         "page_size": page_size,
         "json": 1
@@ -69,12 +66,11 @@ async def fetch_page(session, category, page, page_size, sem):
         except Exception as e:
             print(f"⚠ Erreur API page {page} :", e)
             return []
-
-
 # -------------------------
 # Async image download
 # -------------------------
-async def download_image(session, url, image_id, sem, folder="data/images/sugar"):
+async def download_image(session, url, image_id, sem, category=CATEGORY):
+    folder = f"data/raw/images/{category}"
     if not url:
         return
 
@@ -93,7 +89,7 @@ async def download_image(session, url, image_id, sem, folder="data/images/sugar"
                 with open(filename, "wb") as f:
                     f.write(content)
         except Exception as e:
-            print(f"⚠ Impossible de télécharger {url} :", e)
+            print(f" Impossible de télécharger {url} :", e)
 
 
 # -------------------------
@@ -126,7 +122,7 @@ async def scrape(category, target_count, page_size, max_pages):
                     image_id = info[0]
 
                     task = asyncio.create_task(
-                        download_image(session, image_url, image_id, sem_img)
+                        download_image(session, image_url, image_id, sem_img, category)
                     )
                     image_tasks.append(task)
 
@@ -154,7 +150,7 @@ def save_to_csv(filename, rows):
 # -------------------------
 def main():
     products = asyncio.run(scrape(CATEGORY, TARGET_COUNT, PAGE_SIZE, MAX_PAGES))
-    output_file = f"{OUTPUT_DIR}/metadata_{CATEGORY}_{TARGET_COUNT}.csv"
+    output_file = f"data/raw/metadata_{CATEGORY}_{TARGET_COUNT}.csv"
     save_to_csv(output_file, products)
     print(f"✔ Fichier {output_file} créé. Produits valides collectés : {len(products)}")
 
