@@ -208,3 +208,7 @@ __marimo__/
 
 data/raw/
 data/interim/
+
+data/raw/images/
+!data/raw.dvc
+data/localstore/
