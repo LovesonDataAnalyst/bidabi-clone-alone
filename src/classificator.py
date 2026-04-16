@@ -53,6 +53,10 @@ def set_seed(seed=42):
 
 set_seed(42)
 
+# --- Dossier de sortie pour les graphiques ---
+os.makedirs("models", exist_ok=True)
+os.makedirs("models/plots", exist_ok=True)
+
 # --- Constantes globales ---
 H = 256
 W = 256
@@ -319,6 +323,7 @@ plt.xlabel("Epoch")
 plt.ylabel("Loss")
 plt.title("Training & Validation Loss (ResNet18 full FT + MixUp)")
 plt.legend()
+plt.savefig("models/plots/loss_curve.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 plt.figure(figsize=(8, 5))
@@ -327,6 +332,7 @@ plt.xlabel("Epoch")
 plt.ylabel("Accuracy")
 plt.title("Validation Accuracy (ResNet18 full FT + MixUp)")
 plt.legend()
+plt.savefig("models/plots/accuracy_curve.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 
@@ -414,6 +420,7 @@ def plot_confusion_matrix(cm, classes):
     plt.xlabel("Predicted")
     plt.ylabel("True")
     plt.title("Confusion Matrix (ResNet18 full FT + MixUp)")
+    plt.savefig("models/plots/confusion_matrix.png", dpi=150, bbox_inches="tight")
     plt.show()
 
 
@@ -470,6 +477,7 @@ plt.bar(dataset.classes, per_class_acc)
 plt.ylabel("Accuracy")
 plt.title("Per-class Accuracy (ResNet18 full FT + MixUp)")
 plt.xticks(rotation=45)
+plt.savefig("models/plots/per_class_accuracy.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 
@@ -500,6 +508,7 @@ def plot_roc_curves(labels, probs, classes):
     plt.ylabel("True Positive Rate")
     plt.title("ROC Curves (ResNet18 full FT + MixUp)")
     plt.legend()
+    plt.savefig("models/plots/roc_curves.png", dpi=150, bbox_inches="tight")
     plt.show()
 
 
@@ -572,6 +581,7 @@ def compute_hardest_samples(model, loader, classes, top_k=12):
         plt.axis("off")
 
     plt.suptitle("Top Hardest Samples (Highest Loss)")
+    plt.savefig("models/plots/hardest_samples.png", dpi=150, bbox_inches="tight")
     plt.show()
 
 
@@ -636,6 +646,7 @@ for i, cls in enumerate(dataset.classes):
 
 plt.legend()
 plt.title("t-SNE Embedding Visualization")
+plt.savefig("models/plots/tsne_embedding.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 
@@ -651,4 +662,7 @@ if umap_available:
 
     plt.legend()
     plt.title("UMAP Embedding Visualization")
+    plt.savefig("models/plots/umap_embedding.png", dpi=150, bbox_inches="tight")
     plt.show()
+
+print("\n✔ Tous les graphiques sauvegardés dans models/plots/")
